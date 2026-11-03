@@ -16,6 +16,24 @@ class ReservationWindowClosed(Exception):
 
 
 @contextmanager
+def request_window(endpoint):
+    """Share pacing and the last booking check across phone and desktop sessions."""
+    global _last_finished
+    with _gate:
+        gap = random.uniform(3.0, 5.0)
+        time.sleep(max(0.0, gap - (time.monotonic() - _last_finished)))
+        if _reservation_guard is not None:
+            from pykorail.constants import API_ENDPOINTS
+            latest_start, stopped = _reservation_guard
+            if endpoint == API_ENDPOINTS["reserve"] and (stopped() or time.time() >= latest_start):
+                raise ReservationWindowClosed()
+        try:
+            yield
+        finally:
+            _last_finished = time.monotonic()
+
+
+@contextmanager
 def reservation_window(latest_start, stopped):
     global _reservation_guard
     previous = _reservation_guard
@@ -39,30 +57,18 @@ class AndroidSession:
         self.native = jclass("kr.personal.ktxpocket.AndroidHttp")()
 
     def _request(self, method, url, params=None, data=None, headers=None, **kwargs):
-        global _last_finished
         endpoint = url
         if params:
             url += ("&" if "?" in url else "?") + urlencode(params, doseq=True)
         body = urlencode(data, doseq=True) if data is not None else ""
         combined = {**self.headers, **(headers or {})}
-        # A single global gate also paces login and reservation requests, not just searches.
-        with _gate:
-            gap = random.uniform(3.0, 5.0)
-            time.sleep(max(0.0, gap - (time.monotonic() - _last_finished)))
-            if _reservation_guard is not None:
-                from pykorail.constants import API_ENDPOINTS
-                latest_start, stopped = _reservation_guard
-                # Recheck after pacing, immediately before the booking request leaves the phone.
-                if endpoint == API_ENDPOINTS["reserve"] and (stopped() or time.time() >= latest_start):
-                    raise ReservationWindowClosed()
+        with request_window(endpoint):
             try:
                 result = self.native.exchange(url, method, json.dumps(combined), body)
                 return Response(json.loads(str(result)))
             except Exception:
                 from pykorail.exceptions import TransportError
                 raise TransportError("Android HTTPS connection failed") from None
-            finally:
-                _last_finished = time.monotonic()
 
     def get(self, url, **kwargs):
         return self._request("GET", url, **kwargs)

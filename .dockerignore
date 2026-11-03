@@ -1,0 +1,13 @@
+*
+!Dockerfile
+!webapp/
+!webapp/**
+!app/
+!app/src/
+!app/src/main/
+!app/src/main/python/
+!app/src/main/python/*.py
+!tests/
+!tests/*.py
+**/__pycache__
+**/*.pyc

@@ -5,7 +5,7 @@ import unittest
 from datetime import datetime
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, gettempdir
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "app/src/main/python"))
 import engine
@@ -171,7 +171,8 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(listener.onStatus.call_args.args[0], "stopped")
 
     def test_device_identity_is_preserved(self):
-        with TemporaryDirectory(dir=Path(__file__).parent) as directory:
+        with TemporaryDirectory(prefix="ktx-engine-test-") as directory:
+            self.assertEqual(Path(directory).resolve().parent, Path(gettempdir()).resolve())
             first = engine.device_profile(directory)
             second = engine.device_profile(directory)
             self.assertEqual(first.id, second.id)

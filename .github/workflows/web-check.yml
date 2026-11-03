@@ -1,0 +1,31 @@
+name: Docker web checks
+on:
+  push:
+    paths: ['webapp/**', 'Dockerfile', 'compose.yaml', '.dockerignore', 'app/src/main/python/**', 'tests/**', '.github/workflows/web-check.yml']
+  pull_request:
+    paths: ['webapp/**', 'Dockerfile', 'compose.yaml', '.dockerignore', 'app/src/main/python/**', 'tests/**', '.github/workflows/web-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose and build
+        run: |
+          docker compose config --quiet
+          docker compose build
+      - name: Test with external network disabled
+        run: docker run --rm --network none --read-only --tmpfs /tmp --entrypoint python ktx-pocket-web:local -m unittest discover -s tests -v
+      - name: Start and check local server
+        run: |
+          docker compose up -d --wait
+          curl --fail --silent http://localhost:8765/health
+          docker compose restart
+          docker compose up -d --wait
+          curl --fail --silent http://localhost:8765/api/state | python3 -c 'import json,sys; state=json.load(sys.stdin); assert not state["running"]'
+      - name: Stop local server
+        if: always()
+        run: docker compose down

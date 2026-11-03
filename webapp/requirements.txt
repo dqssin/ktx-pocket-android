@@ -1,0 +1,5 @@
+Flask==3.1.2
+waitress==3.0.2
+curl-cffi==0.17.0
+pycryptodome==4.2.0
+./webapp/vendor/pykorail-0.5.1-py3-none-any.whl

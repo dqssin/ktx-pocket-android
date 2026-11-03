@@ -152,7 +152,7 @@ def device_profile(directory):
     return profile
 
 
-def run(config_json, directory, listener):
+def run(config_json, directory, listener, transport=None):
     config = json.loads(config_json)
     attempts = 0
     client = None
@@ -172,8 +172,11 @@ def run(config_json, directory, listener):
 
     try:
         plans = validated_conditions(config)
-        from android_transport import install, reservation_window, ReservationWindowClosed
-        install()
+        if transport is None:
+            import android_transport as transport
+        transport.install()
+        reservation_window = transport.reservation_window
+        ReservationWindowClosed = transport.ReservationWindowClosed
         from pykorail import Korail, TrainType, AdultPassenger
         from pykorail.exceptions import (
             AccessRestrictedError, HttpStatusError, LoginFailedError, NeedToLoginError,
