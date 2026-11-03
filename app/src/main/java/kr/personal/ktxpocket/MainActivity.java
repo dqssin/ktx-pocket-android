@@ -96,7 +96,7 @@ public final class MainActivity extends Activity {
         activityProgress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal); activityProgress.setIndeterminate(true); activityProgress.setIndeterminateTintList(ColorStateList.valueOf(ACCENT));
         LinearLayout.LayoutParams progressSize = new LinearLayout.LayoutParams(-1, dp(4)); progressSize.topMargin = dp(16); statusCard.addView(activityProgress, progressSize); activityProgress.setVisibility(View.GONE);
         attempts = text("조회 0회 · 요청 간격 3~5초", 11, MUTED); attempts.setFontFeatureSettings("tnum"); add(attempts, 10);
-        pay = button("코레일톡 예약내역", 1); pay.setOnClickListener(v -> {
+        pay = button("코레일톡 열기", 1); pay.setOnClickListener(v -> {
             Intent launch = getPackageManager().getLaunchIntentForPackage("com.korail.talk");
             if (launch != null) startActivity(launch); else toast("코레일톡 앱을 설치한 뒤 예약내역을 확인하세요.");
         }); add(pay, 14); pay.setVisibility(View.GONE);
@@ -162,7 +162,7 @@ public final class MainActivity extends Activity {
         });
         alternativeList = vertical(); add(alternativeList, 14);
 
-        content = page; loginFold = fold(page, "로그인", "로그인 · 저장 옵션", true); content = loginFold.body;
+        content = page; loginFold = fold(page, "로그인", "계정 정보 · 저장 옵션", true); content = loginFold.body;
         username = field("회원번호 · 이메일 · 휴대폰 번호", InputType.TYPE_CLASS_TEXT); username.setSaveEnabled(false);
         password = field("코레일 비밀번호", InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD); password.setSaveEnabled(false);
         setupCredentialMemory(); loginFold.expand(username.getText().length() == 0 || password.getText().length() == 0);
@@ -282,7 +282,7 @@ public final class MainActivity extends Activity {
         rememberId.setOnCheckedChangeListener((button, checked) -> {
             if (applyingCredentials || checked) return;
             applyingCredentials = true; rememberPassword.setChecked(false); applyingCredentials = false;
-            try { credentialStore.clear(); credentialNote.setText("기억을 해제하고 저장된 로그인 정보를 지웠습니다."); }
+            try { credentialStore.clear(); credentialNote.setText("저장을 해제하고 로그인 정보를 지웠습니다."); }
             catch (Exception error) { credentialNote.setText("저장된 정보 삭제를 완료하지 못했습니다. 지우기 버튼으로 다시 시도하세요."); }
             forgetCredentials.setEnabled(credentialStore.hasSaved());
         });
@@ -290,7 +290,7 @@ public final class MainActivity extends Activity {
             if (applyingCredentials) return;
             if (checked) {
                 rememberId.setChecked(true);
-                credentialNote.setText("검색을 시작하면 아이디·비밀번호 암호화 저장");
+                credentialNote.setText("검색 시작 시 아이디·비밀번호 암호화 저장");
             } else {
                 try { credentialStore.forgetPassword(); credentialNote.setText("저장된 비밀번호를 지웠습니다. 현재 입력한 값은 이번 검색에만 사용합니다."); }
                 catch (Exception error) { credentialNote.setText("저장된 비밀번호 삭제를 완료하지 못했습니다. 지우기 버튼으로 다시 시도하세요."); }
@@ -557,7 +557,7 @@ public final class MainActivity extends Activity {
     private void updateTimes() {
         controlValue(dateButton, "날짜", date.format(DateTimeFormatter.ofPattern("M월 d일 (E)", Locale.KOREAN)));
         controlValue(fromButton, "출발 이후", from.toString());
-        controlValue(toButton, "출발 이전", to + " 이전");
+        controlValue(toButton, "출발 이전", to.toString());
     }
 
     private void controlValue(Button button, String label, String value) {
