@@ -9,6 +9,9 @@ jobs:
   screen:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    env:
+      ANDROID_USER_HOME: ${{ runner.temp }}/android
+      ANDROID_AVD_HOME: ${{ runner.temp }}/android/avd
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -46,7 +49,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
           sdkmanager 'emulator' 'system-images;android-35;google_apis;x86_64'
-          echo no | avdmanager create avd --name screen --package 'system-images;android-35;google_apis;x86_64' --device pixel_5 --force
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo no | avdmanager create avd --name screen --path "$ANDROID_AVD_HOME/screen.avd" --package 'system-images;android-35;google_apis;x86_64' --device pixel_5 --force
+          printf 'avd.ini.encoding=UTF-8\npath=%s\n' "$ANDROID_AVD_HOME/screen.avd" > "$ANDROID_AVD_HOME/screen.ini"
+          "$ANDROID_HOME/emulator/emulator" -list-avds | grep -x screen
           "$ANDROID_HOME/emulator/emulator" -avd screen -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -memory 2048 > emulator.log 2>&1 &
           timeout 180 adb wait-for-device
           timeout 180 bash -c 'until adb shell getprop sys.boot_completed | grep -q 1; do sleep 2; done'
