@@ -54,7 +54,7 @@ public final class SearchAlerts extends BroadcastReceiver {
             for (int i = 0; i < 2; i++) cancel(context, PAYMENT, PAYMENT_ID + i);
             for (int i = 0; i < times.length; i++) if (times[i] > now) schedule(context, PAYMENT, PAYMENT_ID + i, times[i], true);
         } catch (RuntimeException error) {
-            show(context, "KTX 예약 성공 · 결제를 확인해주세요", prefs(context).getString("reservation", "") + "\n\n결제 재알림을 설정하지 못했습니다. 코레일톡에서 결제 기한을 확인해주세요.", true);
+            show(context, "KTX 예약 성공 · 결제를 확인하세요", prefs(context).getString("reservation", "") + "\n\n결제 재알림을 설정하지 못했습니다. 코레일톡에서 결제 기한을 확인하세요.", true);
         }
     }
 
@@ -95,7 +95,7 @@ public final class SearchAlerts extends BroadcastReceiver {
     }
 
     private static void interrupted(Context context) {
-        String message = "검색 프로세스가 종료되어 더 이상 조회하지 않습니다. 예약 처리 중이었다면 코레일톡 예약내역을 먼저 확인해주세요.";
+        String message = "검색 프로세스가 종료되어 더 이상 조회하지 않습니다. 예약 처리 중이었다면 코레일톡 예약내역을 먼저 확인하세요.";
         finishWatching(context);
         context.getSharedPreferences(SearchService.PREFS, 0).edit().putString("kind", "error").putString("message", message).putLong("updated", System.currentTimeMillis()).apply();
         show(context, "KTX 검색이 중단되었습니다", message, false);
@@ -107,7 +107,7 @@ public final class SearchAlerts extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
             if (prefs(context).getBoolean("watching", false)) interrupted(context);
             if (paymentPending(context)) {
-                show(context, "이전 KTX 예약의 결제를 확인해주세요", prefs(context).getString("reservation", "코레일톡 예약내역을 확인해주세요."), true);
+                show(context, "이전 KTX 예약의 결제를 확인하세요", prefs(context).getString("reservation", "코레일톡 예약내역을 확인하세요."), true);
                 schedulePayment(context);
             }
             return;
@@ -123,9 +123,9 @@ public final class SearchAlerts extends BroadcastReceiver {
         } else if (PAYMENT.equals(action) && paymentPending(context)) {
             long deadline = prefs(context).getLong("deadline", 0);
             String prefix = deadline > 0 && System.currentTimeMillis() >= deadline
-                ? "알림이 늦게 도착해 결제 기한이 지났을 수 있습니다. 예약내역을 확인해주세요.\n\n"
-                : "예약 후 결제를 확인해주세요. 이미 결제·취소했다면 재알림을 꺼주세요.\n\n";
-            show(context, "KTX 결제 기한을 확인해주세요", prefix + prefs(context).getString("reservation", "코레일톡 예약내역을 확인해주세요."), true);
+                ? "알림이 늦게 도착해 결제 기한이 지났을 수 있습니다. 예약내역을 확인하세요.\n\n"
+                : "예약 후 결제를 확인하세요. 이미 결제·취소했다면 재알림을 끄세요.\n\n";
+            show(context, "KTX 결제 기한을 확인하세요", prefix + prefs(context).getString("reservation", "코레일톡 예약내역을 확인하세요."), true);
         }
     }
 }

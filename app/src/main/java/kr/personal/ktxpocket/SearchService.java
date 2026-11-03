@@ -112,7 +112,7 @@ public final class SearchService extends Service {
     @Override public void onTimeout(int startId, int type) {
         timedOut = true;
         stopRequested = true;
-        publish("error", "안드로이드 실행 시간 제한으로 검색을 중지했습니다. 예약 처리 중이었다면 코레일 예약내역을 먼저 확인해주세요.", getSharedPreferences(PREFS, 0).getInt("attempts", 0));
+        publish("error", "안드로이드 실행 시간 제한으로 검색을 중지했습니다. 예약 처리 중이었다면 코레일 예약내역을 먼저 확인하세요.", getSharedPreferences(PREFS, 0).getInt("attempts", 0));
         stopForeground(STOP_FOREGROUND_REMOVE);
         stopSelf();
     }

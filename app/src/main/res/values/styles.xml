@@ -1,15 +1,15 @@
 <resources>
     <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
         <item name="android:fontFamily">sans-serif</item>
-        <item name="android:colorAccent">#BB492B</item>
-        <item name="android:colorControlActivated">#BB492B</item>
-        <item name="android:colorControlHighlight">#20BB492B</item>
-        <item name="android:textColorPrimary">#282924</item>
-        <item name="android:textColorSecondary">#6B6C64</item>
+        <item name="android:colorAccent">#2B4F6C</item>
+        <item name="android:colorControlActivated">#2B4F6C</item>
+        <item name="android:colorControlHighlight">#182B4F6C</item>
+        <item name="android:textColorPrimary">#1D2732</item>
+        <item name="android:textColorSecondary">#5B6773</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:statusBarColor">#F7F5F1</item>
+        <item name="android:statusBarColor">#FFFFFF</item>
         <item name="android:navigationBarColor">#FFFFFF</item>
         <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowBackground">#F7F5F1</item>
+        <item name="android:windowBackground">#FFFFFF</item>
     </style>
 </resources>
