@@ -21,6 +21,16 @@ def validate(config, now=None):
     count = config.get("passengers")
     if isinstance(count, bool) or not isinstance(count, int) or not 1 <= count <= 6:
         raise ValueError("어른 인원은 1~6명으로 선택하세요.")
+
+    adults = config.get("passengers")
+    seniors = config.get("seniors", 0)
+    children = config.get("children", 0)
+    for count in (adults, seniors, children):
+        if isinstance(count, bool) or not isinstance(count, int) or not 0 <= count <= 6:
+            raise ValueError("어른·경로·어린이 인원은 각각 0~6명으로 선택하세요.")
+    if not 1 <= adults + seniors + children <= 6:
+        raise ValueError("어른·경로·어린이 합계는 1~6명이어야 합니다.")
+        
     try:
         start = datetime.strptime(config["date"] + config["start"], "%Y%m%d%H%M").replace(tzinfo=KST)
         end = datetime.strptime(config["date"] + config["end"], "%Y%m%d%H%M").replace(tzinfo=KST)
@@ -46,6 +56,8 @@ def validated_conditions(config, now=None):
         if not isinstance(entry, dict):
             raise ValueError("검색 조건을 다시 확인하세요.")
         condition = {key: entry.get(key) for key in ("departure", "arrival", "date", "start", "end", "passengers", "option")}
+        condition["seniors"] = entry.get("seniors", 0)
+        condition["children"] = entry.get("children", 0)
         condition.update(username=config.get("username"), password=config.get("password"), confirmed=config.get("confirmed"))
         if access:
             stations, limit, boarding = access
@@ -177,7 +189,7 @@ def run(config_json, directory, listener, transport=None):
         transport.install()
         reservation_window = transport.reservation_window
         ReservationWindowClosed = transport.ReservationWindowClosed
-        from pykorail import Korail, TrainType, AdultPassenger
+        from pykorail import Korail, TrainType, AdultPassenger, SeniorPassenger, ChildPassenger
         from pykorail.exceptions import (
             AccessRestrictedError, HttpStatusError, LoginFailedError, NeedToLoginError,
             NoResultsError, PastDepartureError, PasswordChangeRequiredError, SoldOutError,
@@ -200,7 +212,12 @@ def run(config_json, directory, listener, transport=None):
             plan = available[turn % len(available)]
             condition, start, end = plan
             turn += 1
-            passengers = [AdultPassenger(condition["passengers"])]
+
+            passengers = []
+            if condition["passengers"] > 0: passengers.append(AdultPassenger(condition["passengers"]))
+            if condition.get("seniors", 0) > 0: passengers.append(SeniorPassenger(condition["seniors"]))
+            if condition.get("children", 0) > 0:passengers.append(ChildPassenger(condition["children"]))
+                
             attempts += 1
             status("searching", f"조건 {plans.index(plan) + 1}/{len(plans)} · {condition['departure']} → {condition['arrival']} 조회 중")
             try:
