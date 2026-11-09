@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 import engine
 
-FIELDS = ('departure', 'arrival', 'date', 'start', 'end', 'passengers', 'option')
+FIELDS = ('departure', 'arrival', 'date', 'start', 'end', 'passengers', 'option', 'seniors', 'children')
 
 
 def prepare(body, credentials):
@@ -14,6 +14,8 @@ def prepare(body, credentials):
     for entry in entries:
         if not isinstance(entry, dict): raise ValueError('예약 조건을 확인하세요.')
         value = {key: entry.get(key) for key in FIELDS}
+        value['seniors'] = entry.get('seniors', 0)
+        value['children'] = entry.get('children', 0)
         for key in ('departure', 'arrival'):
             if not isinstance(value[key], str) or len(value[key]) > 40:
                 raise ValueError('역 이름을 확인하세요.')
