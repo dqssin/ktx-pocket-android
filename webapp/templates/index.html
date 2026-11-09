@@ -33,9 +33,21 @@
             <label>출발 이전<input id="end-time" type="time" value="18:00" required></label>
           </div>
           <div class="two-columns">
-            <label>탑승 인원<select id="passengers"><option value="1">어른 1명</option><option value="2">어른 2명</option><option value="3">어른 3명</option><option value="4">어른 4명</option><option value="5">어른 5명</option><option value="6">어른 6명</option></select></label>
-            <label>좌석 종류<select id="seat"><option value="GENERAL_ONLY">일반실만</option><option value="GENERAL_FIRST">일반실 우선 · 없으면 특실</option><option value="SPECIAL_ONLY">특실만</option><option value="SPECIAL_FIRST">특실 우선 · 없으면 일반실</option></select></label>
-          </div>
+            <label>어른 인원<input id="passengers" type="number" min="0" max="6" step="1" value="1" required></label>
+            <label>경로 인원<input id="seniors" type="number" min="0" max="6" step="1" value="0" required></label>
+            <label>어린이 인원<input id="children" type="number" min="0" max="6" step="1" value="0" required></label>
+            <label>좌석 종류<select id="seat">
+              <option value="GENERAL_ONLY">일반실만</option>
+              <option value="GENERAL_FIRST">일반실 우선 · 없으면 특실</option>
+              <option value="SPECIAL_ONLY">특실만</option>
+              <option value="SPECIAL_FIRST">특실 우선 · 없으면 일반실</option>
+           </select></label>
+           </div>
+           <p class="hint">
+             어른·경로·어린이 합계는 1~6명입니다.
+             승객 구분은 실제 탑승자의 자격에 맞게 선택하세요.
+             실제 할인과 금액은 코레일 예약내역에서 확인하세요.
+          </p>
           <p class="hint">종료 시각 이전에 출발하는 열차를 조회합니다. 인접 좌석은 보장되지 않습니다.</p>
         </section>
         <details class="section" id="alternatives-section">
