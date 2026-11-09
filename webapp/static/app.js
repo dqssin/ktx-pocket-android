@@ -16,17 +16,22 @@ async function api(path, value) {
 }
 function showError(error) { $('form-error').textContent = error.message; $('form-error').focus(); }
 function describe(value) {
-  return `${value.departure} → ${value.arrival} · ${value.date.slice(0,4)}-${value.date.slice(4,6)}-${value.date.slice(6)}\n${value.start.slice(0,2)}:${value.start.slice(2)} ~ ${value.end.slice(0,2)}:${value.end.slice(2)} 이전 · 어른 ${value.passengers}명 · ${seatNames[value.option]}`;
+  const date=`${value.date.slice(0,4)}-${value.date.slice(4, 6)}-${value.date.slice(6)}`;
+  const start=`${value.start.slice(0,2)}:${value.start.slice(2)}`;
+  const end =`${value.end.slice(0, 2)}:${value.end.slice(2)}`;
+
+  return `${value.departure} → ${value.arrival} · ${date}\n`+`${start} ~ ${end} 이전 · `+`어른 ${value.passengers}명 · `+`경로 ${value.seniors ?? 0}명 · `+`어린이 ${value.children ?? 0}명 · `+`${seatNames[value.option]}`;
 }
 function condition() {
-  return {departure:$('departure').value.trim(),arrival:$('arrival').value.trim(),date:$('date').value.replaceAll('-',''),start:$('start-time').value.replace(':',''),end:$('end-time').value.replace(':',''),passengers:Number($('passengers').value),option:$('seat').value};
+  return {departure:$('departure').value.trim(),arrival:$('arrival').value.trim(),date:$('date').value.replaceAll('-',''),start:$('start-time').value.replace(':',''),end:$('end-time').value.replace(':',''),passengers:Number($('passengers').value),seniors: Number($('seniors').value),children: Number($('children').value),option: $('seat').value};
 }
 function restoreCondition(value) {
   $('departure').value=value.departure; $('arrival').value=value.arrival;
   $('date').value=`${value.date.slice(0,4)}-${value.date.slice(4,6)}-${value.date.slice(6)}`;
   $('start-time').value=`${value.start.slice(0,2)}:${value.start.slice(2)}`;
-  $('end-time').value=`${value.end.slice(0,2)}:${value.end.slice(2)}`;
-  $('passengers').value=value.passengers; $('seat').value=value.option;
+  $('end-time').value =`${value.end.slice(0,2)}:${value.end.slice(2)}`;
+  $('passengers').value=value.passengers;$('seniors').value = value.seniors ?? 0;
+  $('children').value = value.children ?? 0;$('seat').value = value.option;
 }
 function renderAlternatives() {
   $('alternatives').replaceChildren();
